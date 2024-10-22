@@ -54,14 +54,14 @@ def login():
     else:
         return jsonify({"message": "Usuario o contraseña inválidos"}), 401
 
+# Proteger rutas con JWT
+@app.before_request
+def before_request():
+    if request.endpoint not in ['login', 'register']:
+        jwt_required()(lambda: None)()
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=2000, debug=True)
 
 
-git init
-git add .
-git commit -m "commit #1: Autenticacion de la apí   /main   /yoel"
-git branch -M main
-git remote add origin https://github.com/Yoel-Cristian-Quispe-Diaz/Api-Rest-Con-Python.git
-git push -u origin main
