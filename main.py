@@ -61,6 +61,55 @@ def before_request():
         jwt_required()(lambda: None)()
 
 
+# Pacientes
+@app.route('/pacientes', methods=['GET'])
+def get_pacientes():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM pacientes")
+    pacientes = cursor.fetchall()
+    cursor.close()
+    
+    return jsonify(pacientes)
+
+@app.route('/pacientes', methods=['POST'])
+def crear_paciente():
+    data = request.get_json()
+    cursor = db.cursor()
+    sql = "INSERT INTO pacientes (nombre, apellido, fecha_nacimiento, direccion, telefono, correo) VALUES (%s, %s, %s, %s, %s, %s)"
+    values = (data['nombre'], data['apellido'], data['fecha_nacimiento'], data['direccion'], data['telefono'], data['correo'])
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    return jsonify({"mensaje": "Paciente creado exitosamente"}), 201
+
+@app.route('/pacientes/<int:id>', methods=['GET'])
+def obtener_paciente(id):
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM pacientes WHERE id = %s", (id,))
+    paciente = cursor.fetchone()
+    cursor.close()
+    return jsonify(paciente)
+
+@app.route('/pacientes/<int:id>', methods=['PUT'])
+def actualizar_paciente(id):
+    data = request.get_json()
+    cursor = db.cursor()
+    sql = "UPDATE pacientes SET nombre=%s, apellido=%s, fecha_nacimiento=%s, direccion=%s, telefono=%s, correo=%s WHERE id=%s"
+    values = (data['nombre'], data['apellido'], data['fecha_nacimiento'], data['direccion'], data['telefono'], data['correo'], id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    return jsonify({"mensaje": "Paciente actualizado exitosamente"})
+
+@app.route('/pacientes/<int:id>', methods=['DELETE'])
+def eliminar_paciente(id):
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM pacientes WHERE id = %s", (id,))
+    db.commit()
+    cursor.close()
+    return jsonify({"mensaje": "Paciente eliminado exitosamente"})
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
 
