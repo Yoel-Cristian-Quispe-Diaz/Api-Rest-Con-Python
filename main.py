@@ -11,6 +11,8 @@ app.config['JWT_SECRET_KEY'] = 'your-secret-key'  # ¡Cambia esto!
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 jwt = JWTManager(app)
 
+
+
 # Conexión a la base de datos
 db = mysql.connector.connect(
     host="localhost",
@@ -22,6 +24,10 @@ db = mysql.connector.connect(
 # Función auxiliar para hash MD5
 def generate_md5_hash(password):
     return hashlib.md5(password.encode()).hexdigest()
+
+@app.get("/")
+async def root():
+    return {"message": "Bienvenido a la API de gestión de medica"}
 
 # Registro de usuario
 @app.route('/register', methods=['POST'])
@@ -111,6 +117,4 @@ def eliminar_paciente(id):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
-
-
+        app.run(host='0.0.0.0', port=5000, debug=True)
