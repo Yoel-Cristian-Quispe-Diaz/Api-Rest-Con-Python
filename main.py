@@ -115,6 +115,53 @@ def eliminar_paciente(id):
     cursor.close()
     return jsonify({"mensaje": "Paciente eliminado exitosamente"})
 
+# Gestión de citas
+@app.route('/citas', methods=['GET'])
+def obtener_citas():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM citas")
+    citas = cursor.fetchall()
+    cursor.close()
+    return jsonify(citas)
+
+@app.route('/citas', methods=['POST'])
+def crear_cita():
+    data = request.get_json()
+    cursor = db.cursor()
+    sql = "INSERT INTO citas (paciente_id, medico_id, fecha_hora, motivo, estado) VALUES (%s, %s, %s, %s, %s)"
+    values = (data['paciente_id'], data['medico_id'], data['fecha_hora'], data['motivo'], data['estado'])
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    return jsonify({"mensaje": "Cita creada exitosamente"}), 201
+
+@app.route('/citas/<int:id>', methods=['GET'])
+def obtener_cita(id):
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM citas WHERE id = %s", (id,))
+    cita = cursor.fetchone()
+    cursor.close()
+    return jsonify(cita)
+
+@app.route('/citas/<int:id>', methods=['PUT'])
+def actualizar_cita(id):
+    data = request.get_json()
+    cursor = db.cursor()
+    sql = "UPDATE citas SET paciente_id=%s, medico_id=%s, fecha_hora=%s, motivo=%s, estado=%s WHERE id=%s"
+    values = (data['paciente_id'], data['medico_id'], data['fecha_hora'], data['motivo'], data['estado'], id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    return jsonify({"mensaje": "Cita actualizada exitosamente"})
+
+@app.route('/citas/<int:id>', methods=['DELETE'])
+def eliminar_cita(id):
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM citas WHERE id = %s", (id,))
+    db.commit()
+    cursor.close()
+    return jsonify({"mensaje": "Cita eliminada exitosamente"})
+
 # Gestión de médicos
 @app.route('/medicos', methods=['GET'])
 def obtener_medicos():
