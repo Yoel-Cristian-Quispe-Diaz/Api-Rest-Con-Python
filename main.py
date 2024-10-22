@@ -156,6 +156,53 @@ def eliminar_cita(id):
     cursor.close()
     return jsonify({"mensaje": "Cita eliminada exitosamente"})
 
+# Gestión de médicos
+@app.route('/medicos', methods=['GET'])
+def obtener_medicos():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM medicos")
+    medicos = cursor.fetchall()
+    cursor.close()
+    return jsonify(medicos)
+
+@app.route('/medicos', methods=['POST'])
+def crear_medico():
+    data = request.get_json()
+    cursor = db.cursor()
+    sql = "INSERT INTO medicos (nombre, apellido, especialidad, telefono, correo) VALUES (%s, %s, %s, %s, %s)"
+    values = (data['nombre'], data['apellido'], data['especialidad'], data['telefono'], data['correo'])
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    return jsonify({"mensaje": "Médico creado exitosamente"}), 201
+
+@app.route('/medicos/<int:id>', methods=['GET'])
+def obtener_medico(id):
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM medicos WHERE id = %s", (id,))
+    medico = cursor.fetchone()
+    cursor.close()
+    return jsonify(medico)
+
+@app.route('/medicos/<int:id>', methods=['PUT'])
+def actualizar_medico(id):
+    data = request.get_json()
+    cursor = db.cursor()
+    sql = "UPDATE medicos SET nombre=%s, apellido=%s, especialidad=%s, telefono=%s, correo=%s WHERE id=%s"
+    values = (data['nombre'], data['apellido'], data['especialidad'], data['telefono'], data['correo'], id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    return jsonify({"mensaje": "Médico actualizado exitosamente"})
+
+@app.route('/medicos/<int:id>', methods=['DELETE'])
+def eliminar_medico(id):
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM medicos WHERE id = %s", (id,))
+    db.commit()
+    cursor.close()
+    return jsonify({"mensaje": "Médico eliminado exitosamente"})
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=2000, debug=True)
 
